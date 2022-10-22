@@ -1,7 +1,6 @@
 import React from 'react';
 import './App.css';
 import logo from './getfilxLogo.png';
-import { useTable } from 'react-table';
 import axios from 'axios';
 import Table from './TableContainer.js';
 import { format} from 'date-fns';
