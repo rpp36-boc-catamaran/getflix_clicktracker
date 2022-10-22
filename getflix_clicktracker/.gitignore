@@ -11,6 +11,13 @@
 # production
 /build
 
+# dotenv environment variables file
+.env
+.env.test
+
+#database config
+config.js
+
 # misc
 .DS_Store
 .env.local
