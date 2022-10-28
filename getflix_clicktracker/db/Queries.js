@@ -72,13 +72,34 @@ const postClick = (data, cb) => {
   pool
     .query(upsertUser)
     .then(() => {
-      const upsertMovie = {
-        text: 'INSERT INTO movies(id, movietitle) VALUES ($1, $2) \
-        ON CONFLICT (id) DO UPDATE SET movietitle = excluded.movietitle',
-        values: [data.movieid, data.movietitle]
-      }
-      pool.query(upsertMovie)
-      .then(() => {
+      if (data.movieid !== null) {
+        const upsertMovie = {
+          text: 'INSERT INTO movies(id, movietitle) VALUES ($1, $2) \
+          ON CONFLICT (id) DO UPDATE SET movietitle = excluded.movietitle',
+          values: [data.movieid, data.movietitle]
+        }
+        pool.query(upsertMovie)
+        .then(() => {
+          const now = Date.now()
+          const upsertClick = {
+            text: 'INSERT INTO clicks(userid, timestamp, webpage, object, movieid) \
+            VALUES ($1, $2, $3, $4, $5)',
+            values: [data.userid, now, data.webpage, data.object, data.movieid]
+          }
+          pool.query(upsertClick)
+          .then(() => {
+            cb(null, 'Created')
+          })
+          .catch(e => {
+            console.error(e.stack)
+            cb(e.stack, null)
+          })
+        })
+        .catch(e => {
+          console.error(e.stack)
+          cb(e.stack, null)
+        })
+      } else {
         const now = Date.now()
         const upsertClick = {
           text: 'INSERT INTO clicks(userid, timestamp, webpage, object, movieid) \
@@ -93,11 +114,7 @@ const postClick = (data, cb) => {
           console.error(e.stack)
           cb(e.stack, null)
         })
-      })
-      .catch(e => {
-        console.error(e.stack)
-        cb(e.stack, null)
-      })
+      }
     })
     .catch(e => {
       console.error(e.stack)
